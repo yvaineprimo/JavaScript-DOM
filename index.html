@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My DOM Playground</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            width: 100%;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #playground {
+            min-height: 200px;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #fafafa;
+            border-radius: 5px;
+        }
+        #console {
+            background: #2c2c2c;
+            color: lime;
+            padding: 15px;
+            font-family: monospace;
+            height: 150px;
+            overflow-y: auto;
+            border-radius: 5px;
+        }
+        .highlight {
+            background-color: yellow;
+            padding: 5px;
+        }
+        .bg-blue {
+            background-color: #cce5ff;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 My DOM Playground</h1>
+        <p><strong>Piliin ang DOM Action:</strong></p>
+
+        <select id="actionSelect">
+            <option value="">-- Pumili ng Action --</option>
+            <option value="getElementById">getElementById</option>
+            <option value="querySelector">querySelector</option>
+            <option value="textContent">Baguhin TextContent</option>
+            <option value="innerHTML">Baguhin InnerHTML</option>
+            <option value="addClass">Magdagdag ng Class</option>
+            <option value="removeClass">Tanggalin Class</option>
+            <option value="toggleClass">Toggle Class</option>
+            <option value="createAndAppend">Gumawa at Idagdag</option>
+            <option value="removeElement">Alisin Element</option>
+            <option value="addEvent">Magdagdag ng Event</option>
+            <option value="setAttribute">Set Attribute</option>
+            <option value="scrollTo">I-scroll dito</option>
+        </select>
+
+        <button id="runBtn">▶️ I-run ang Napiling Action</button>
+
+        <h3>🎯 Playground Area:</h3>
+        <div id="playground">
+            <p id="sampleText">Original text dito.</p>
+            <p class="highlight">May highlight ako!</p>
+            <button id="sampleBtn">Sample Button</button>
+            <div id="target">Target para sa scroll</div>
+        </div>
+
+        <h3>📟 Console Log:</h3>
+        <div id="console"></div>
+    </div>
+
+    <script>
+        const playground = document.getElementById("playground");
+        const consoleDiv = document.getElementById("console");
+        const runBtn = document.getElementById("runBtn");
+        const actionSelect = document.getElementById("actionSelect");
+
+        // Helper: para makita sa console kung ano ginawa
+        function log(message) {
+            consoleDiv.innerHTML += "> " + message + "<br>";
+            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto scroll down
+        }
+
+        runBtn.addEventListener("click", function() {
+            const action = actionSelect.value;
+
+            if (!action) {
+                alert("Pumili muna ng action!");
+                return;
+            }
+
+            log(`Running action: ${action}`);
+
+            switch(action) {
+
+                case "getElementById":
+                    let elem = document.getElementById("sampleText");
+                    elem.style.color = "red";
+                    log("Nahanap ang #sampleText at pula na!");
+                    break;
+
+                case "querySelector":
+                    let firstHighlight = document.querySelector(".highlight");
+                    firstHighlight.style.fontSize = "20px";
+                    log("Na-style ang unang .highlight!");
+                    break;
+
+                case "textContent":
+                    document.getElementById("sampleText").textContent = "Nabago gamit textContent!";
+                    log("Nabago ang text (walang HTML allowed).");
+                    break;
+
+                case "innerHTML":
+                    document.getElementById("sampleText").innerHTML = "<strong>Nabold gamit innerHTML!</strong>";
+                    log("Nabago gamit HTML tags.");
+                    break;
+
+                case "addClass":
+                    document.getElementById("sampleText").classList.add("bg-blue");
+                    log("Nadagdagan ng class 'bg-blue'.");
+                    break;
+
+                case "removeClass":
+                    document.getElementById("sampleText").classList.remove("bg-blue");
+                    log("Natanggal ang class 'bg-blue'.");
+                    break;
+
+                case "toggleClass":
+                    document.getElementById("sampleText").classList.toggle("bg-blue");
+                    log("Tinoggle ang class 'bg-blue'.");
+                    break;
+
+                case "createAndAppend":
+                    let newP = document.createElement("p");
+                    newP.textContent = "✨ Bagong nilikha at idinagdag!";
+                    newP.style.color = "green";
+                    playground.appendChild(newP);
+                    log("Nilikha at idinagdag ang bagong <p>.");
+                    break;
+
+                case "removeElement":
+                    let target = document.getElementById("target");
+                    if (target) {
+                        target.remove();
+                        log("Tinanggal ang element #target.");
+                    } else {
+                        log("Wala nang #target para tanggalin.");
+                    }
+                    break;
+
+                case "addEvent":
+                    document.getElementById("sampleBtn").addEventListener("click", function() {
+                        alert("Napindot mo ako gamit addEventListener!");
+                    });
+                    log("Nakabitin na ang click event sa button.");
+                    break;
+
+                case "setAttribute":
+                    document.getElementById("sampleBtn").setAttribute("disabled", true);
+                    log("Hindi na maclick ang button (disabled).");
+                    break;
+
+                case "scrollTo":
+                    document.getElementById("target").scrollIntoView({ behavior: "smooth" });
+                    log("In-scroll view ang #target.");
+                    break;
+
+                default:
+                    log("Unknown action.");
+            }
+        });
+    </script>
+</body>
+</html>

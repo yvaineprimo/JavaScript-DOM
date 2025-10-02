@@ -45,6 +45,19 @@
             margin: 20px 0;
             background-color: #fafafa;
             border-radius: 5px;
+            position: relative;
+        }
+        #codeDisplay {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            border-left: 4px solid #3498db;
         }
         #console {
             background: #2c2c2c;
@@ -54,6 +67,7 @@
             height: 150px;
             overflow-y: auto;
             border-radius: 5px;
+            margin-top: 20px;
         }
         .highlight {
             background-color: yellow;
@@ -63,6 +77,15 @@
             background-color: #cce5ff;
             padding: 10px;
             border-left: 4px solid #007bff;
+        }
+        .code-snippet {
+            background: #eee;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #d63384;
         }
     </style>
 </head>
@@ -94,8 +117,11 @@
             <p id="sampleText">Original text dito.</p>
             <p class="highlight">May highlight ako!</p>
             <button id="sampleBtn">Sample Button</button>
-            <div id="target">Target para sa scroll</div>
+            <div id="target">🎯 Target para sa scroll</div>
         </div>
+
+        <h3>📜 Live Code Display:</h3>
+        <div id="codeDisplay">Pumili ng action at pindutin ang button para makita ang ginamit na DOM code dito.</div>
 
         <h3>📟 Console Log:</h3>
         <div id="console"></div>
@@ -106,11 +132,20 @@
         const consoleDiv = document.getElementById("console");
         const runBtn = document.getElementById("runBtn");
         const actionSelect = document.getElementById("actionSelect");
+        const codeDisplay = document.getElementById("codeDisplay");
 
-        // Helper: para makita sa console kung ano ginawa
+        // Helper: log to console
         function log(message) {
             consoleDiv.innerHTML += "> " + message + "<br>";
-            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Auto scroll down
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Helper: update live code display
+        function showCode(code, explanation = "") {
+            codeDisplay.innerHTML = `
+                <div style="color:#ffcc00; margin-bottom:8px;">📌 ${explanation}</div>
+                <div class="code-snippet">${code}</div>
+            `;
         }
 
         runBtn.addEventListener("click", function() {
@@ -121,45 +156,80 @@
                 return;
             }
 
-            log(`Running action: ${action}`);
+            log(`🚀 Running: ${action}`);
+
+            // Reset playground for some actions
+            if (action === "createAndAppend") {
+                // No reset needed
+            } else if (action === "removeElement") {
+                // We'll handle missing element inside case
+            }
 
             switch(action) {
 
                 case "getElementById":
                     let elem = document.getElementById("sampleText");
                     elem.style.color = "red";
-                    log("Nahanap ang #sampleText at pula na!");
+                    showCode(
+                        `let elem = document.getElementById("sampleText");\nelem.style.color = "red";`,
+                        "✅ Nahanap ang element gamit ang ID at pina-pula."
+                    );
+                    log("OK: Ginamit ang getElementById.");
                     break;
 
                 case "querySelector":
                     let firstHighlight = document.querySelector(".highlight");
                     firstHighlight.style.fontSize = "20px";
-                    log("Na-style ang unang .highlight!");
+                    showCode(
+                        `let elem = document.querySelector(".highlight");\nelem.style.fontSize = "20px";`,
+                        "✅ Na-style ang unang element gamit ang CSS selector."
+                    );
+                    log("OK: Ginamit ang querySelector.");
                     break;
 
                 case "textContent":
                     document.getElementById("sampleText").textContent = "Nabago gamit textContent!";
-                    log("Nabago ang text (walang HTML allowed).");
+                    showCode(
+                        `document.getElementById("sampleText").textContent = "Nabago gamit textContent!";`,
+                        "✅ Nabago ang text (PLAIN TEXT only — walang HTML)."
+                    );
+                    log("OK: Ginamit ang textContent.");
                     break;
 
                 case "innerHTML":
                     document.getElementById("sampleText").innerHTML = "<strong>Nabold gamit innerHTML!</strong>";
-                    log("Nabago gamit HTML tags.");
+                    showCode(
+                        `document.getElementById("sampleText").innerHTML = "<strong>Nabold gamit innerHTML!</strong>";`,
+                        "✅ Nabago ang content kasama ang HTML tags."
+                    );
+                    log("OK: Ginamit ang innerHTML.");
                     break;
 
                 case "addClass":
                     document.getElementById("sampleText").classList.add("bg-blue");
-                    log("Nadagdagan ng class 'bg-blue'.");
+                    showCode(
+                        `element.classList.add("bg-blue");`,
+                        "✅ Nadagdagan ng CSS class."
+                    );
+                    log("OK: Ginamit ang classList.add().");
                     break;
 
                 case "removeClass":
                     document.getElementById("sampleText").classList.remove("bg-blue");
-                    log("Natanggal ang class 'bg-blue'.");
+                    showCode(
+                        `element.classList.remove("bg-blue");`,
+                        "✅ Natanggal ang CSS class."
+                    );
+                    log("OK: Ginamit ang classList.remove().");
                     break;
 
                 case "toggleClass":
                     document.getElementById("sampleText").classList.toggle("bg-blue");
-                    log("Tinoggle ang class 'bg-blue'.");
+                    showCode(
+                        `element.classList.toggle("bg-blue");`,
+                        "✅ Tinoggle (on/off) ang CSS class."
+                    );
+                    log("OK: Ginamit ang classList.toggle().");
                     break;
 
                 case "createAndAppend":
@@ -167,16 +237,28 @@
                     newP.textContent = "✨ Bagong nilikha at idinagdag!";
                     newP.style.color = "green";
                     playground.appendChild(newP);
-                    log("Nilikha at idinagdag ang bagong <p>.");
+                    showCode(
+                        `let newP = document.createElement("p");\nnewP.textContent = "...";\nparent.appendChild(newP);`,
+                        "✅ Nilikha at idinagdag ang bagong element."
+                    );
+                    log("OK: Ginamit ang createElement() + appendChild().");
                     break;
 
                 case "removeElement":
                     let target = document.getElementById("target");
                     if (target) {
                         target.remove();
-                        log("Tinanggal ang element #target.");
+                        showCode(
+                            `element.remove();`,
+                            "✅ Tinanggal ang element gamit .remove()."
+                        );
+                        log("OK: Tinanggal ang #target.");
                     } else {
-                        log("Wala nang #target para tanggalin.");
+                        showCode(
+                            `// Element not found`,
+                            "⚠️ Wala nang #target para tanggalin."
+                        );
+                        log("ERROR: #target not found.");
                     }
                     break;
 
@@ -184,21 +266,43 @@
                     document.getElementById("sampleBtn").addEventListener("click", function() {
                         alert("Napindot mo ako gamit addEventListener!");
                     });
-                    log("Nakabitin na ang click event sa button.");
+                    showCode(
+                        `button.addEventListener("click", function() { ... });`,
+                        "✅ Nakabitin ang click event sa button."
+                    );
+                    log("OK: Ginamit ang addEventListener().");
                     break;
 
                 case "setAttribute":
                     document.getElementById("sampleBtn").setAttribute("disabled", true);
-                    log("Hindi na maclick ang button (disabled).");
+                    showCode(
+                        `element.setAttribute("disabled", true);`,
+                        "✅ Binago ang attribute ng element."
+                    );
+                    log("OK: Ginamit ang setAttribute().");
                     break;
 
                 case "scrollTo":
-                    document.getElementById("target").scrollIntoView({ behavior: "smooth" });
-                    log("In-scroll view ang #target.");
+                    let scrollToElem = document.getElementById("target");
+                    if (scrollToElem) {
+                        scrollToElem.scrollIntoView({ behavior: "smooth" });
+                        showCode(
+                            `element.scrollIntoView({ behavior: "smooth" });`,
+                            "✅ In-scroll view ang element gamit .scrollIntoView()."
+                        );
+                        log("OK: Ginamit ang scrollIntoView().");
+                    } else {
+                        showCode(
+                            `// Element not found`,
+                            "⚠️ Nawala na ang #target. Hindi makakascroll."
+                        );
+                        log("ERROR: #target not found.");
+                    }
                     break;
 
                 default:
-                    log("Unknown action.");
+                    showCode("// Unknown action", "❌ Hindi kilalang action.");
+                    log("ERROR: Unknown action.");
             }
         });
     </script>
